@@ -8,7 +8,7 @@ const navLinks = [
   { label: 'About', href: '/#about', isRoute: false },
   { label: 'Services', href: '/#services', isRoute: false },
   { label: 'Book Spray', href: '/book-spray', isRoute: true },
-  { label: 'Contact', href: '/#contact', isRoute: false },
+  { label: 'Contact', href: '/contact', isRoute: true },
 ];
 
 export function Header() {
