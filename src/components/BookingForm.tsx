@@ -70,11 +70,7 @@ interface FormData {
   address: string;
 }
 
-interface BookingFormProps {
-  webhookUrl: string;
-}
-
-export function BookingForm({ webhookUrl }: BookingFormProps) {
+export function BookingForm() {
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -111,7 +107,7 @@ export function BookingForm({ webhookUrl }: BookingFormProps) {
 
   const validateStep = (step: number): boolean => {
     setErrors({});
-    
+
     try {
       if (step === 1) {
         step1Schema.parse({
@@ -158,14 +154,7 @@ export function BookingForm({ webhookUrl }: BookingFormProps) {
   const handleSubmit = async () => {
     if (!validateStep(3)) return;
 
-    if (!webhookUrl) {
-      toast({
-        title: 'Webhook URL Required',
-        description: 'Please enter your n8n webhook URL above the form.',
-        variant: 'destructive',
-      });
-      return;
-    }
+
 
     setIsLoading(true);
 
@@ -186,7 +175,18 @@ export function BookingForm({ webhookUrl }: BookingFormProps) {
     };
 
     try {
-      await fetch(webhookUrl, {
+      // TODO: Replace with actual n8n webhook URL
+      const WEBHOOK_URL = "";
+
+      if (!WEBHOOK_URL) {
+        console.warn("No webhook URL configured");
+        // Simulate success for demo purposes if no URL
+        setIsSuccess(true);
+        setIsLoading(false);
+        return;
+      }
+
+      await fetch(WEBHOOK_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -296,7 +296,7 @@ export function BookingForm({ webhookUrl }: BookingFormProps) {
             <h3 className="text-xl font-heading font-bold text-foreground mb-6">
               Farmer Details
             </h3>
-            
+
             <div className="space-y-2">
               <Label htmlFor="fullName">Full Name *</Label>
               <Input

@@ -5,6 +5,7 @@ import { Stats } from '@/components/Stats';
 import { About } from '@/components/About';
 import { Services } from '@/components/Services';
 import { Process } from '@/components/Process';
+import { DroneAppsPromotion } from '@/components/DroneAppsPromotion';
 import { Testimonials } from '@/components/Testimonials';
 import { BlogPreview } from '@/components/BlogPreview';
 import { FinalCTA } from '@/components/FinalCTA';
@@ -18,6 +19,7 @@ const Index = () => {
     <main className="min-h-screen">
       <Header />
       <Hero />
+      <DroneAppsPromotion />
       <Stats />
       <About />
       <Services />

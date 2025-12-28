@@ -2,27 +2,31 @@ import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 gsap.registerPlugin(ScrollTrigger);
 
 const blogPosts = [
   {
-    image: 'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=600&auto=format&fit=crop&q=80',
-    title: 'The Future of Precision Agriculture with Drones',
-    excerpt: 'Discover how agricultural drones are revolutionizing farming practices and increasing crop yields worldwide.',
-    date: 'Dec 20, 2024',
+    slug: 'spraying-drones-guide',
+    image: 'https://images.unsplash.com/photo-1530267981375-f0de93fe1e91?w=600&auto=format&fit=crop&q=80',
+    title: 'How Spraying Drones Can Help Your Farm: A Simple Guide',
+    excerpt: 'Farming is getting smarter with new technology. One of the best tools for modern farmers is the spraying drone. These drones can spray pesticides, fertilizers, and even water, making farming easier and more efficient. In this...',
+    date: 'Dec 28, 2024',
   },
   {
-    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&auto=format&fit=crop&q=80',
-    title: '5 Benefits of Drone Spraying Over Traditional Methods',
-    excerpt: 'Learn why more farmers are switching to drone-based spraying for efficiency, safety, and cost savings.',
-    date: 'Dec 15, 2024',
+    slug: 'start-drone-service',
+    image: 'https://images.unsplash.com/photo-1586771107445-d3ca888129ff?w=600&auto=format&fit=crop&q=80',
+    title: 'How to Start Your Drone Spraying Service: A Simple Guide for Farmers',
+    excerpt: 'Farming is changing with new technology. One of the best tools for farmers today is drones. Many farmers are using drones for spraying pesticides, fertilizers, and even water. If you want to start a drone spraying service, this guide will help you step by step. Why...',
+    date: 'Dec 25, 2024',
   },
   {
-    image: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=600&auto=format&fit=crop&q=80',
-    title: 'Sustainable Farming: Reducing Chemical Usage with Precision',
-    excerpt: 'How precision drone technology helps farmers minimize environmental impact while maximizing productivity.',
-    date: 'Dec 10, 2024',
+    slug: 'increase-farm-yield',
+    image: 'https://images.unsplash.com/photo-1625246333195-981d549e7293?w=600&auto=format&fit=crop&q=80',
+    title: "How Can Agriculture Drones Increase My Farm's Yield?",
+    excerpt: 'Farming in India is not easy. Farmers face many problems like low crop yield, pests, and high labor costs. But now, new technology is helping farmers. One of the best innovations is agriculture drones. These flying machines can help farmers grow more crops, save time,...',
+    date: 'Dec 22, 2024',
   },
 ];
 
@@ -76,9 +80,10 @@ export function BlogPreview() {
         {/* Blog Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {blogPosts.map((post) => (
-            <article
+            <Link
               key={post.title}
-              className="blog-card group bg-card rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300 hover:-translate-y-2 cursor-pointer"
+              to={`/blog/${post.slug}`}
+              className="blog-card group bg-card rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300 hover:-translate-y-2 cursor-pointer block"
             >
               {/* Image */}
               <div className="aspect-video overflow-hidden">
@@ -104,7 +109,7 @@ export function BlogPreview() {
                   <ArrowRight className="w-4 h-4" />
                 </span>
               </div>
-            </article>
+            </Link>
           ))}
         </div>
       </div>

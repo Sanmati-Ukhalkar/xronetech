@@ -45,7 +45,7 @@ export function Stats() {
   }, []);
 
   return (
-    <section className="relative -mt-20 z-20">
+    <section className="relative -mt-12 md:-mt-20 z-20">
       <div className="container-custom px-4 sm:px-6 lg:px-8">
         <div
           ref={containerRef}

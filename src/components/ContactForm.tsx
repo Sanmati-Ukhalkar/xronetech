@@ -16,11 +16,7 @@ const contactSchema = z.object({
   message: z.string().trim().min(10, 'Message must be at least 10 characters').max(1000, 'Message is too long'),
 });
 
-interface ContactFormProps {
-  webhookUrl: string;
-}
-
-export function ContactForm({ webhookUrl }: ContactFormProps) {
+export function ContactForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -72,14 +68,7 @@ export function ContactForm({ webhookUrl }: ContactFormProps) {
       }
     }
 
-    if (!webhookUrl) {
-      toast({
-        title: 'Webhook URL Required',
-        description: 'Please enter your n8n webhook URL to submit the form.',
-        variant: 'destructive',
-      });
-      return;
-    }
+
 
     setIsLoading(true);
 
@@ -95,8 +84,18 @@ export function ContactForm({ webhookUrl }: ContactFormProps) {
       },
     };
 
+    // TODO: Replace with actual n8n webhook URL
+    const WEBHOOK_URL = "";
+
+    if (!WEBHOOK_URL) {
+      console.warn("No webhook URL configured");
+      setIsSuccess(true);
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      await fetch(webhookUrl, {
+      await fetch(WEBHOOK_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -1,10 +1,11 @@
 import { Phone, Mail, MapPin, Facebook, Twitter, Linkedin, Instagram } from 'lucide-react';
+import logo from '@/assets/xrone lgoo white.png';
 
 const quickLinks = [
   { label: 'Home', href: '#' },
   { label: 'About Us', href: '#about' },
   { label: 'Services', href: '#services' },
-  { label: 'Book Spray', href: '#book' },
+  { label: 'Book Drone Service', href: '#book' },
   { label: 'Contact', href: '#contact' },
 ];
 
@@ -32,21 +33,12 @@ export function Footer() {
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
           {/* Brand */}
           <div>
-            <a href="#" className="flex items-center gap-2 mb-6">
-              <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  className="w-6 h-6 text-primary-foreground"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                  <path d="M2 17l10 5 10-5" />
-                  <path d="M2 12l10 5 10-5" />
-                </svg>
-              </div>
-              <span className="font-heading font-bold text-xl">XroneTech</span>
+            <a href="#" className="inline-block mb-6">
+              <img
+                src={logo}
+                alt="XroneTech Logo"
+                className="h-32 w-auto object-contain"
+              />
             </a>
             <p className="text-primary-foreground/70 leading-relaxed mb-6">
               Leading agricultural drone services company helping farmers

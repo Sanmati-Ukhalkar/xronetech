@@ -13,7 +13,7 @@ const trustIndicators = [
 ];
 
 const BookSpray = () => {
-  const [webhookUrl, setWebhookUrl] = useState('');
+
 
   return (
     <main className="min-h-screen bg-background">
@@ -39,25 +39,7 @@ const BookSpray = () => {
           <div className="grid lg:grid-cols-3 gap-10">
             {/* Form */}
             <div className="lg:col-span-2">
-              {/* Webhook URL Input */}
-              <div className="bg-secondary/50 rounded-xl p-6 mb-8">
-                <Label htmlFor="webhookUrl" className="text-sm font-medium">
-                  n8n Webhook URL
-                </Label>
-                <p className="text-sm text-muted-foreground mb-3">
-                  Enter your n8n webhook URL to receive form submissions
-                </p>
-                <Input
-                  id="webhookUrl"
-                  type="url"
-                  placeholder="https://your-n8n-instance.com/webhook/..."
-                  value={webhookUrl}
-                  onChange={(e) => setWebhookUrl(e.target.value)}
-                  className="h-12"
-                />
-              </div>
-
-              <BookingForm webhookUrl={webhookUrl} />
+              <BookingForm />
             </div>
 
             {/* Sidebar */}

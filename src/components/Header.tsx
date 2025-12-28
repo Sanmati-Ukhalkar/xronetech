@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import logo from '@/assets/logo.png';
+import whiteLogo from '@/assets/xrone lgoo white.png';
 
 const navLinks = [
   { label: 'Home', href: '/', isRoute: true },
@@ -32,9 +34,8 @@ export function Header() {
   const useLightTheme = !isHomePage || isScrolled;
 
   const renderNavLink = (link: typeof navLinks[0]) => {
-    const className = `font-medium transition-colors duration-200 hover:text-primary ${
-      useLightTheme ? 'text-foreground' : 'text-primary-foreground/90 hover:text-primary-foreground'
-    }`;
+    const className = `font-medium transition-colors duration-200 hover:text-primary ${useLightTheme ? 'text-foreground' : 'text-primary-foreground/90 hover:text-primary-foreground'
+      }`;
 
     if (link.isRoute) {
       return (
@@ -79,32 +80,20 @@ export function Header() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        useLightTheme
-          ? 'bg-card/95 backdrop-blur-md shadow-header'
-          : 'bg-transparent'
-      }`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${useLightTheme
+        ? 'bg-card/95 backdrop-blur-md shadow-header'
+        : 'bg-transparent'
+        }`}
     >
       <nav className="container-custom section-padding !py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                className="w-6 h-6 text-primary-foreground"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                <path d="M2 17l10 5 10-5" />
-                <path d="M2 12l10 5 10-5" />
-              </svg>
-            </div>
-            <span className={`font-heading font-bold text-xl ${useLightTheme ? 'text-foreground' : 'text-primary-foreground'}`}>
-              XroneTech
-            </span>
+          <Link to="/" className="block">
+            <img
+              src={useLightTheme ? logo : whiteLogo}
+              alt="XroneTech Logo"
+              className="h-12 md:h-16 w-auto object-contain"
+            />
           </Link>
 
           {/* Desktop Navigation */}
@@ -119,7 +108,7 @@ export function Header() {
               <span>Call Now</span>
             </a>
             <Button variant={useLightTheme ? "default" : "hero"} size="default" asChild>
-              <Link to="/book-spray">Book Now</Link>
+              <Link to="/book-spray">Book Drone Service</Link>
             </Button>
           </div>
 
@@ -144,7 +133,7 @@ export function Header() {
               {navLinks.map(renderMobileNavLink)}
               <Button variant="default" size="lg" className="mt-2" asChild>
                 <Link to="/book-spray" onClick={() => setIsMobileMenuOpen(false)}>
-                  Book Now
+                  Book Drone Service
                 </Link>
               </Button>
             </div>

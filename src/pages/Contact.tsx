@@ -45,7 +45,7 @@ const socialLinks = [
 ];
 
 const Contact = () => {
-  const [webhookUrl, setWebhookUrl] = useState('');
+
   const infoRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -99,25 +99,7 @@ const Contact = () => {
           <div className="grid lg:grid-cols-2 gap-12">
             {/* Contact Form */}
             <div>
-              {/* Webhook URL Input */}
-              <div className="bg-secondary/50 rounded-xl p-6 mb-8">
-                <Label htmlFor="webhookUrl" className="text-sm font-medium">
-                  n8n Webhook URL
-                </Label>
-                <p className="text-sm text-muted-foreground mb-3">
-                  Enter your n8n webhook URL to receive form submissions
-                </p>
-                <Input
-                  id="webhookUrl"
-                  type="url"
-                  placeholder="https://your-n8n-instance.com/webhook/..."
-                  value={webhookUrl}
-                  onChange={(e) => setWebhookUrl(e.target.value)}
-                  className="h-12"
-                />
-              </div>
-
-              <ContactForm webhookUrl={webhookUrl} />
+              <ContactForm />
             </div>
 
             {/* Contact Info */}

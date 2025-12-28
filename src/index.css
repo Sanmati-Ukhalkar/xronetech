@@ -91,7 +91,7 @@
     --border: 122 30% 20%;
     --input: 122 30% 20%;
     --ring: 122 47% 45%;
-    
+
     --text-secondary: 0 0% 65%;
     --hero-overlay: 122 54% 10%;
     --cta-dark-bg: 122 54% 12%;
@@ -125,8 +125,31 @@
     @apply bg-background text-foreground font-body antialiased;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-heading font-bold tracking-tight;
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--secondary));
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--primary));
+    border-radius: 5px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary-dark));
   }
 }
 
@@ -144,20 +167,16 @@
   }
 
   .gradient-overlay {
-    background: linear-gradient(
-      135deg,
-      hsl(var(--hero-overlay) / 0.85) 0%,
-      hsl(var(--hero-overlay) / 0.7) 50%,
-      hsl(var(--hero-overlay) / 0.6) 100%
-    );
+    background: linear-gradient(to bottom,
+        hsl(var(--hero-overlay) / 0.8) 0%,
+        hsl(var(--hero-overlay) / 0.3) 50%,
+        hsl(var(--hero-overlay) / 0.9) 100%);
   }
 
   .cta-gradient {
-    background: linear-gradient(
-      135deg,
-      hsl(var(--cta-dark-bg)) 0%,
-      hsl(var(--primary-dark)) 100%
-    );
+    background: linear-gradient(135deg,
+        hsl(var(--cta-dark-bg)) 0%,
+        hsl(var(--primary-dark)) 100%);
   }
 }
 
@@ -175,6 +194,7 @@
       opacity: 0;
       transform: translateY(20px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
@@ -185,6 +205,7 @@
     from {
       opacity: 0;
     }
+
     to {
       opacity: 1;
     }
