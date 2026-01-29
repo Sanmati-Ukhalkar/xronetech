@@ -7,6 +7,9 @@ import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Calendar, User, Clock, Share2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useEffect } from 'react';
+import blogImage1 from '@/assets/blog_spraying_drone_guide.png';
+import blogImage2 from '@/assets/blog_start_drone_service.png';
+import blogImage3 from '@/assets/blog_increase_farm_yield.png';
 
 // This data will eventually be moved to a separate file or CMS
 const blogData: Record<string, {
@@ -24,7 +27,7 @@ const blogData: Record<string, {
         date: 'Dec 28, 2024',
         author: 'XroneTech Team',
         readTime: '5 min read',
-        image: 'https://images.unsplash.com/photo-1530267981375-f0de93fe1e91?w=1200&auto=format&fit=crop&q=80',
+        image: blogImage1,
         content: (
             <>
                 <p className="lead text-xl text-muted-foreground mb-8">
@@ -132,7 +135,7 @@ const blogData: Record<string, {
         date: 'Dec 25, 2024',
         author: 'XroneTech Team',
         readTime: '6 min read',
-        image: 'https://images.unsplash.com/photo-1586771107445-d3ca888129ff?w=1200&auto=format&fit=crop&q=80',
+        image: blogImage2,
         content: (
             <>
                 <p className="lead text-xl text-muted-foreground mb-8">
@@ -250,7 +253,7 @@ const blogData: Record<string, {
         date: 'Dec 22, 2024',
         author: 'XroneTech Team',
         readTime: '4 min read',
-        image: 'https://images.unsplash.com/photo-1625246333195-981d549e7293?w=1200&auto=format&fit=crop&q=80',
+        image: blogImage3,
         content: (
             <>
                 <p className="lead text-xl text-muted-foreground mb-8">
@@ -415,6 +418,15 @@ const BlogPost = () => {
 
                 {/* Article Content */}
                 <div className="container-custom max-w-3xl mx-auto">
+                    {/* Featured Image */}
+                    <div className="mb-10 rounded-2xl overflow-hidden shadow-lg aspect-video">
+                        <img
+                            src={post.image}
+                            alt={post.title}
+                            className="w-full h-full object-cover"
+                        />
+                    </div>
+
                     <article className="prose prose-lg prose-green max-w-none 
                 prose-headings:font-heading prose-headings:font-bold prose-headings:text-foreground
                 prose-p:text-muted-foreground prose-p:leading-relaxed

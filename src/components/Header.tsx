@@ -92,7 +92,7 @@ export function Header() {
             <img
               src={useLightTheme ? logo : whiteLogo}
               alt="XroneTech Logo"
-              className="h-12 md:h-16 w-auto object-contain"
+              className={`${useLightTheme ? 'h-14 md:h-24' : 'h-20 md:h-32'} w-auto object-contain`}
             />
           </Link>
 
@@ -103,7 +103,7 @@ export function Header() {
 
           {/* CTA Button */}
           <div className="hidden md:flex items-center gap-4">
-            <a href="tel:+1234567890" className={`flex items-center gap-2 font-medium ${useLightTheme ? 'text-foreground' : 'text-primary-foreground'}`}>
+            <a href="tel:+918007700522" className={`flex items-center gap-2 font-medium ${useLightTheme ? 'text-foreground' : 'text-primary-foreground'}`}>
               <Phone className="w-4 h-4" />
               <span>Call Now</span>
             </a>

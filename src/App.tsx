@@ -8,6 +8,9 @@ import BookSpray from "./pages/BookSpray";
 import Contact from "./pages/Contact";
 import BlogPost from "./pages/BlogPost";
 import NotFound from "./pages/NotFound";
+import RefundPolicy from "./pages/RefundPolicy";
+import Terms from "./pages/Terms";
+import ScrollToTop from "./components/ScrollToTop";
 
 const queryClient = new QueryClient();
 
@@ -17,11 +20,14 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <ScrollToTop />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/book-spray" element={<BookSpray />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/blog/:slug" element={<BlogPost />} />
+          <Route path="/refund-policy" element={<RefundPolicy />} />
+          <Route path="/terms" element={<Terms />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

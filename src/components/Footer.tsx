@@ -1,12 +1,13 @@
 import { Phone, Mail, MapPin, Facebook, Twitter, Linkedin, Instagram } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import logo from '@/assets/xrone lgoo white.png';
 
 const quickLinks = [
-  { label: 'Home', href: '#' },
-  { label: 'About Us', href: '#about' },
-  { label: 'Services', href: '#services' },
-  { label: 'Book Drone Service', href: '#book' },
-  { label: 'Contact', href: '#contact' },
+  { label: 'Home', href: '/' },
+  { label: 'About Us', href: '/#about' },
+  { label: 'Services', href: '/#services' },
+  { label: 'Book Drone Service', href: '/book-spray' },
+  { label: 'Contact', href: '/contact' },
 ];
 
 const services = [
@@ -65,12 +66,12 @@ export function Footer() {
             <ul className="space-y-3">
               {quickLinks.map((link) => (
                 <li key={link.label}>
-                  <a
-                    href={link.href}
+                  <Link
+                    to={link.href}
                     className="text-primary-foreground/70 hover:text-primary-foreground transition-colors"
                   >
                     {link.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -101,19 +102,19 @@ export function Footer() {
               <li className="flex items-center gap-3">
                 <Phone className="w-5 h-5 text-primary flex-shrink-0" />
                 <a
-                  href="tel:+911234567890"
+                  href="tel:+918007700522"
                   className="text-primary-foreground/70 hover:text-primary-foreground transition-colors"
                 >
-                  +91 123 456 7890
+                  +91-8007700522
                 </a>
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-primary flex-shrink-0" />
                 <a
-                  href="mailto:info@xronetech.com"
+                  href="mailto:support@xronetech.com"
                   className="text-primary-foreground/70 hover:text-primary-foreground transition-colors"
                 >
-                  info@xronetech.com
+                  support@xronetech.com
                 </a>
               </li>
             </ul>
@@ -126,18 +127,18 @@ export function Footer() {
             © {currentYear} XroneTech. All rights reserved.
           </p>
           <div className="flex gap-6 text-sm">
-            <a
-              href="#"
-              className="text-primary-foreground/60 hover:text-primary-foreground transition-colors"
-            >
-              Privacy Policy
-            </a>
-            <a
-              href="#"
+            <Link
+              to="/terms"
               className="text-primary-foreground/60 hover:text-primary-foreground transition-colors"
             >
               Terms of Service
-            </a>
+            </Link>
+            <Link
+              to="/refund-policy"
+              className="text-primary-foreground/60 hover:text-primary-foreground transition-colors"
+            >
+              Refund Policy
+            </Link>
           </div>
         </div>
       </div>

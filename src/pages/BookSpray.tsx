@@ -71,10 +71,10 @@ const BookSpray = () => {
                     Need help with booking?
                   </p>
                   <a
-                    href="tel:+911234567890"
+                    href="tel:+918007700522"
                     className="text-primary font-semibold hover:underline"
                   >
-                    +91 123 456 7890
+                    +91-8007700522
                   </a>
                 </div>
               </div>

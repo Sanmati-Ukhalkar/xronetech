@@ -14,14 +14,14 @@ const contactInfo = [
   {
     icon: Phone,
     title: 'Phone',
-    content: '+91 123 456 7890',
-    link: 'tel:+911234567890',
+    content: '+91-8007700522',
+    link: 'tel:+918007700522',
   },
   {
     icon: Mail,
     title: 'Email',
-    content: 'info@xronetech.com',
-    link: 'mailto:info@xronetech.com',
+    content: 'support@xronetech.com',
+    link: 'mailto:support@xronetech.com',
   },
   {
     icon: MapPin,

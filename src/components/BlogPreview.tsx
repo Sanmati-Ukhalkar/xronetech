@@ -3,27 +3,30 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import blogImage1 from '@/assets/blog_spraying_drone_guide.png';
+import blogImage2 from '@/assets/blog_start_drone_service.png';
+import blogImage3 from '@/assets/blog_increase_farm_yield.png';
 
 gsap.registerPlugin(ScrollTrigger);
 
 const blogPosts = [
   {
     slug: 'spraying-drones-guide',
-    image: 'https://images.unsplash.com/photo-1530267981375-f0de93fe1e91?w=600&auto=format&fit=crop&q=80',
+    image: blogImage1,
     title: 'How Spraying Drones Can Help Your Farm: A Simple Guide',
     excerpt: 'Farming is getting smarter with new technology. One of the best tools for modern farmers is the spraying drone. These drones can spray pesticides, fertilizers, and even water, making farming easier and more efficient. In this...',
     date: 'Dec 28, 2024',
   },
   {
     slug: 'start-drone-service',
-    image: 'https://images.unsplash.com/photo-1586771107445-d3ca888129ff?w=600&auto=format&fit=crop&q=80',
+    image: blogImage2,
     title: 'How to Start Your Drone Spraying Service: A Simple Guide for Farmers',
     excerpt: 'Farming is changing with new technology. One of the best tools for farmers today is drones. Many farmers are using drones for spraying pesticides, fertilizers, and even water. If you want to start a drone spraying service, this guide will help you step by step. Why...',
     date: 'Dec 25, 2024',
   },
   {
     slug: 'increase-farm-yield',
-    image: 'https://images.unsplash.com/photo-1625246333195-981d549e7293?w=600&auto=format&fit=crop&q=80',
+    image: blogImage3,
     title: "How Can Agriculture Drones Increase My Farm's Yield?",
     excerpt: 'Farming in India is not easy. Farmers face many problems like low crop yield, pests, and high labor costs. But now, new technology is helping farmers. One of the best innovations is agriculture drones. These flying machines can help farmers grow more crops, save time,...',
     date: 'Dec 22, 2024',
