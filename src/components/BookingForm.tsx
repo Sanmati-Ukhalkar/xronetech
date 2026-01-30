@@ -1,9 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
-import gsap from 'gsap';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
@@ -17,116 +15,155 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
-import { CalendarIcon, ArrowRight, ArrowLeft, CheckCircle2, Loader2 } from 'lucide-react';
+import { CalendarIcon, CheckCircle2, Loader2, MapPin, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { z } from 'zod';
-import { LocationPicker } from './LocationPicker';
 
-const cropTypes = [
-  'Rice',
-  'Wheat',
-  'Cotton',
-  'Sugarcane',
-  'Maize',
-  'Soybean',
-  'Vegetables',
-  'Fruits',
-  'Other',
+const acresOptions = [
+  '1-2 Acres',
+  '3-5 Acres',
+  '6-10 Acres',
+  '10+ Acres',
 ];
 
-// Validation schemas
-const step1Schema = z.object({
+// Validation schema
+const formSchema = z.object({
   fullName: z.string().trim().min(2, 'Name must be at least 2 characters').max(100, 'Name is too long'),
   phone: z.string().trim().regex(/^[+]?[\d\s-]{10,15}$/, 'Please enter a valid phone number'),
-  email: z.string().trim().email('Please enter a valid email').optional().or(z.literal('')),
-});
-
-const step2Schema = z.object({
-  cropType: z.string().min(1, 'Please select a crop type'),
-  landArea: z.number().min(0.1, 'Land area must be at least 0.1 acres').max(10000, 'Land area seems too large'),
+  acresSpray: z.string().min(1, 'Please select acres to spray'),
   preferredDate: z.date().refine((date) => date >= new Date(new Date().setHours(0, 0, 0, 0)), {
     message: 'Date cannot be in the past',
   }),
-});
-
-const step3Schema = z.object({
-  location: z.object({
-    lat: z.number(),
-    lng: z.number(),
-  }),
-  address: z.string().max(500, 'Address is too long').optional(),
+  pincode: z.string().trim().regex(/^\d{6}$/, 'Pincode must be 6 digits'),
+  latitude: z.number({ required_error: 'Location is required' }),
+  longitude: z.number({ required_error: 'Location is required' }),
 });
 
 interface FormData {
   fullName: string;
   phone: string;
-  email: string;
-  cropType: string;
-  landArea: string;
+  acresSpray: string;
   preferredDate: Date | undefined;
-  location: { lat: number; lng: number } | null;
-  address: string;
+  pincode: string;
+  latitude: number | null;
+  longitude: number | null;
 }
 
 export function BookingForm() {
-  const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isFetchingLocation, setIsFetchingLocation] = useState(true);
+  const [showLocationDialog, setShowLocationDialog] = useState(false);
+  const [locationError, setLocationError] = useState<string>('');
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const formRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
   const [formData, setFormData] = useState<FormData>({
     fullName: '',
     phone: '',
-    email: '',
-    cropType: '',
-    landArea: '',
+    acresSpray: '',
     preferredDate: undefined,
-    location: null,
-    address: '',
+    pincode: '',
+    latitude: null,
+    longitude: null,
   });
 
-  const steps = [
-    { number: 1, title: 'Farmer Details' },
-    { number: 2, title: 'Field Details' },
-    { number: 3, title: 'Location' },
-  ];
-
+  // Auto-fetch geolocation on component mount
   useEffect(() => {
-    if (formRef.current) {
-      gsap.fromTo(
-        formRef.current,
-        { opacity: 0, x: 20 },
-        { opacity: 1, x: 0, duration: 0.5, ease: 'power2.out' }
-      );
-    }
-  }, [currentStep]);
+    fetchUserLocation();
+  }, []);
 
-  const validateStep = (step: number): boolean => {
+  const fetchUserLocation = () => {
+    setIsFetchingLocation(true);
+    setLocationError('');
+
+    if (!navigator.geolocation) {
+      setLocationError('Geolocation is not supported by your browser');
+      setIsFetchingLocation(false);
+      setShowLocationDialog(true);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setFormData((prev) => ({
+          ...prev,
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        }));
+        setIsFetchingLocation(false);
+        toast({
+          title: 'Location Detected',
+          description: 'Your location has been automatically detected.',
+        });
+      },
+      (error) => {
+        let errorMessage = 'Unable to fetch location';
+        
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = 'Location access denied. Please enable location access in your browser settings.';
+            setShowLocationDialog(true);
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = 'Location information is unavailable.';
+            break;
+          case error.TIMEOUT:
+            errorMessage = 'Location request timed out.';
+            break;
+        }
+
+        setLocationError(errorMessage);
+        setIsFetchingLocation(false);
+        
+        toast({
+          title: 'Location Error',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0,
+      }
+    );
+  };
+
+  const handleOpenLocationSettings = () => {
+    setShowLocationDialog(false);
+    toast({
+      title: 'Enable Location Access',
+      description: 'Please click the location icon in your browser address bar and allow location access, then refresh the page.',
+      duration: 7000,
+    });
+  };
+
+  const validateForm = (): boolean => {
     setErrors({});
 
     try {
-      if (step === 1) {
-        step1Schema.parse({
-          fullName: formData.fullName,
-          phone: formData.phone,
-          email: formData.email,
-        });
-      } else if (step === 2) {
-        step2Schema.parse({
-          cropType: formData.cropType,
-          landArea: parseFloat(formData.landArea) || 0,
-          preferredDate: formData.preferredDate,
-        });
-      } else if (step === 3) {
-        step3Schema.parse({
-          location: formData.location,
-          address: formData.address,
-        });
-      }
+      formSchema.parse({
+        fullName: formData.fullName,
+        phone: formData.phone,
+        acresSpray: formData.acresSpray,
+        preferredDate: formData.preferredDate,
+        pincode: formData.pincode,
+        latitude: formData.latitude,
+        longitude: formData.longitude,
+      });
       return true;
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -141,20 +178,17 @@ export function BookingForm() {
     }
   };
 
-  const handleNext = () => {
-    if (validateStep(currentStep)) {
-      setCurrentStep((prev) => Math.min(prev + 1, 3));
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      toast({
+        title: 'Validation Error',
+        description: 'Please fill in all required fields correctly.',
+        variant: 'destructive',
+      });
+      return;
     }
-  };
-
-  const handleBack = () => {
-    setCurrentStep((prev) => Math.max(prev - 1, 1));
-  };
-
-  const handleSubmit = async () => {
-    if (!validateStep(3)) return;
-
-
 
     setIsLoading(true);
 
@@ -165,21 +199,22 @@ export function BookingForm() {
       data: {
         fullName: formData.fullName.trim(),
         phone: formData.phone.trim(),
-        email: formData.email.trim(),
-        cropType: formData.cropType,
-        landArea: formData.landArea,
+        acresSpray: formData.acresSpray,
         preferredDate: formData.preferredDate?.toISOString(),
-        location: formData.location,
-        address: formData.address.trim(),
+        pincode: formData.pincode.trim(),
+        location: {
+          latitude: formData.latitude,
+          longitude: formData.longitude,
+        },
       },
     };
 
     try {
       // TODO: Replace with actual n8n webhook URL
-      const WEBHOOK_URL = "";
+      const WEBHOOK_URL = '';
 
       if (!WEBHOOK_URL) {
-        console.warn("No webhook URL configured");
+        console.warn('No webhook URL configured');
         // Simulate success for demo purposes if no URL
         setIsSuccess(true);
         setIsLoading(false);
@@ -206,15 +241,14 @@ export function BookingForm() {
         setFormData({
           fullName: '',
           phone: '',
-          email: '',
-          cropType: '',
-          landArea: '',
+          acresSpray: '',
           preferredDate: undefined,
-          location: null,
-          address: '',
+          pincode: '',
+          latitude: null,
+          longitude: null,
         });
-        setCurrentStep(1);
         setIsSuccess(false);
+        fetchUserLocation();
       }, 3000);
     } catch (error) {
       console.error('Error submitting form:', error);
@@ -245,168 +279,118 @@ export function BookingForm() {
   }
 
   return (
-    <div className="bg-card rounded-2xl shadow-card p-6 md:p-10">
-      {/* Progress Indicator */}
-      <div className="mb-10">
-        <div className="flex items-center justify-between">
-          {steps.map((step, index) => (
-            <div key={step.number} className="flex items-center flex-1">
-              <div className="flex flex-col items-center">
-                <div
-                  className={cn(
-                    'w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all duration-300',
-                    currentStep >= step.number
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-secondary text-muted-foreground'
-                  )}
-                >
-                  {currentStep > step.number ? (
-                    <CheckCircle2 className="w-5 h-5" />
-                  ) : (
-                    step.number
-                  )}
-                </div>
-                <span
-                  className={cn(
-                    'text-sm font-medium mt-2 text-center hidden sm:block',
-                    currentStep >= step.number ? 'text-foreground' : 'text-muted-foreground'
-                  )}
-                >
-                  {step.title}
-                </span>
-              </div>
-              {index < steps.length - 1 && (
-                <div
-                  className={cn(
-                    'flex-1 h-1 mx-4 rounded-full transition-all duration-300',
-                    currentStep > step.number ? 'bg-primary' : 'bg-secondary'
-                  )}
-                />
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
+    <>
+      {/* Location Permission Dialog */}
+      <AlertDialog open={showLocationDialog} onOpenChange={setShowLocationDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertCircle className="w-5 h-5 text-destructive" />
+              Location Access Required
+            </AlertDialogTitle>
+            <AlertDialogDescription className="space-y-3 pt-2">
+              <p>
+                Location access is required to book our drone spray service. This helps us identify your field location accurately.
+              </p>
+              <p className="text-sm">
+                <strong>To enable location access:</strong>
+              </p>
+              <ol className="text-sm list-decimal list-inside space-y-1 ml-2">
+                <li>Click the location/lock icon in your browser's address bar</li>
+                <li>Select "Allow" or "Always allow" for location access</li>
+                <li>Refresh the page</li>
+              </ol>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setShowLocationDialog(false)}>
+              I'll Enable It
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleOpenLocationSettings}>
+              Got It
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
-      {/* Form Steps */}
-      <div ref={formRef}>
-        {/* Step 1: Farmer Details */}
-        {currentStep === 1 && (
-          <div className="space-y-6">
-            <h3 className="text-xl font-heading font-bold text-foreground mb-6">
-              Farmer Details
-            </h3>
+      {/* Booking Form */}
+      <form onSubmit={handleSubmit} className="bg-card rounded-2xl shadow-card p-6 md:p-10">
+        <h2 className="text-2xl font-heading font-bold text-foreground mb-8">
+          Book Spray Service
+        </h2>
 
-            <div className="space-y-2">
-              <Label htmlFor="fullName">Full Name *</Label>
-              <Input
-                id="fullName"
-                type="text"
-                placeholder="Enter your full name"
-                value={formData.fullName}
-                onChange={(e) =>
-                  setFormData({ ...formData, fullName: e.target.value })
-                }
-                className={cn('h-12', errors.fullName && 'border-destructive')}
-                disabled={isLoading}
-              />
-              {errors.fullName && (
-                <p className="text-sm text-destructive">{errors.fullName}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="phone">Phone Number *</Label>
-              <Input
-                id="phone"
-                type="tel"
-                placeholder="+91 XXXXX XXXXX"
-                value={formData.phone}
-                onChange={(e) =>
-                  setFormData({ ...formData, phone: e.target.value })
-                }
-                className={cn('h-12', errors.phone && 'border-destructive')}
-                disabled={isLoading}
-              />
-              {errors.phone && (
-                <p className="text-sm text-destructive">{errors.phone}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="email">Email (Optional)</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="your@email.com"
-                value={formData.email}
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
-                className={cn('h-12', errors.email && 'border-destructive')}
-                disabled={isLoading}
-              />
-              {errors.email && (
-                <p className="text-sm text-destructive">{errors.email}</p>
-              )}
-            </div>
+        <div className="space-y-6">
+          {/* Name - Full Width */}
+          <div className="space-y-2">
+            <Label htmlFor="fullName">
+              Name <span className="text-destructive">*</span>
+            </Label>
+            <Input
+              id="fullName"
+              type="text"
+              placeholder="Full Name"
+              value={formData.fullName}
+              onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+              className={cn('h-12', errors.fullName && 'border-destructive')}
+              disabled={isLoading}
+            />
+            {errors.fullName && (
+              <p className="text-sm text-destructive">{errors.fullName}</p>
+            )}
           </div>
-        )}
 
-        {/* Step 2: Field Details */}
-        {currentStep === 2 && (
-          <div className="space-y-6">
-            <h3 className="text-xl font-heading font-bold text-foreground mb-6">
-              Field Details
-            </h3>
+          {/* Phone - Full Width */}
+          <div className="space-y-2">
+            <Label htmlFor="phone">
+              Phone <span className="text-destructive">*</span>
+            </Label>
+            <Input
+              id="phone"
+              type="tel"
+              placeholder="Phone Number"
+              value={formData.phone}
+              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              className={cn('h-12', errors.phone && 'border-destructive')}
+              disabled={isLoading}
+            />
+            {errors.phone && (
+              <p className="text-sm text-destructive">{errors.phone}</p>
+            )}
+          </div>
 
+          {/* Acres Spray & Date - 2 Columns */}
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* How much Acres Spray */}
             <div className="space-y-2">
-              <Label htmlFor="cropType">Crop Type *</Label>
+              <Label htmlFor="acresSpray">
+                How much Acers Spray? <span className="text-destructive">*</span>
+              </Label>
               <Select
-                value={formData.cropType}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, cropType: value })
-                }
+                value={formData.acresSpray}
+                onValueChange={(value) => setFormData({ ...formData, acresSpray: value })}
                 disabled={isLoading}
               >
-                <SelectTrigger className={cn('h-12', errors.cropType && 'border-destructive')}>
-                  <SelectValue placeholder="Select crop type" />
+                <SelectTrigger className={cn('h-12', errors.acresSpray && 'border-destructive')}>
+                  <SelectValue placeholder="1-2 Acers" />
                 </SelectTrigger>
                 <SelectContent>
-                  {cropTypes.map((crop) => (
-                    <SelectItem key={crop} value={crop}>
-                      {crop}
+                  {acresOptions.map((option) => (
+                    <SelectItem key={option} value={option}>
+                      {option}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              {errors.cropType && (
-                <p className="text-sm text-destructive">{errors.cropType}</p>
+              {errors.acresSpray && (
+                <p className="text-sm text-destructive">{errors.acresSpray}</p>
               )}
             </div>
 
+            {/* Date */}
             <div className="space-y-2">
-              <Label htmlFor="landArea">Land Area (Acres) *</Label>
-              <Input
-                id="landArea"
-                type="number"
-                step="0.1"
-                min="0.1"
-                placeholder="Enter land area in acres"
-                value={formData.landArea}
-                onChange={(e) =>
-                  setFormData({ ...formData, landArea: e.target.value })
-                }
-                className={cn('h-12', errors.landArea && 'border-destructive')}
-                disabled={isLoading}
-              />
-              {errors.landArea && (
-                <p className="text-sm text-destructive">{errors.landArea}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label>Preferred Date *</Label>
+              <Label>
+                Date <span className="text-destructive">*</span>
+              </Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
@@ -430,9 +414,7 @@ export function BookingForm() {
                   <Calendar
                     mode="single"
                     selected={formData.preferredDate}
-                    onSelect={(date) =>
-                      setFormData({ ...formData, preferredDate: date })
-                    }
+                    onSelect={(date) => setFormData({ ...formData, preferredDate: date })}
                     disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
                     initialFocus
                     className="p-3 pointer-events-auto"
@@ -444,77 +426,113 @@ export function BookingForm() {
               )}
             </div>
           </div>
-        )}
 
-        {/* Step 3: Location */}
-        {currentStep === 3 && (
-          <div className="space-y-6">
-            <h3 className="text-xl font-heading font-bold text-foreground mb-6">
-              Location
-            </h3>
+          {/* Pincode - Full Width */}
+          <div className="space-y-2">
+            <Label htmlFor="pincode">
+              Pincode <span className="text-destructive">*</span>
+            </Label>
+            <Input
+              id="pincode"
+              type="text"
+              placeholder="Enter 6-digit pincode"
+              maxLength={6}
+              value={formData.pincode}
+              onChange={(e) => {
+                const value = e.target.value.replace(/\D/g, '');
+                setFormData({ ...formData, pincode: value });
+              }}
+              className={cn('h-12', errors.pincode && 'border-destructive')}
+              disabled={isLoading}
+            />
+            {errors.pincode && (
+              <p className="text-sm text-destructive">{errors.pincode}</p>
+            )}
+          </div>
 
+          {/* Latitude & Longitude - 2 Columns */}
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Latitude */}
             <div className="space-y-2">
-              <Label>Field Location *</Label>
-              <p className="text-sm text-muted-foreground mb-3">
-                Click on the map to select your field location
-              </p>
-              <LocationPicker
-                value={formData.location}
-                onChange={(location) => setFormData({ ...formData, location })}
-                disabled={isLoading}
-              />
-              {errors.location && (
-                <p className="text-sm text-destructive">{errors.location}</p>
+              <Label htmlFor="latitude">
+                Latitude <span className="text-destructive">*</span>
+              </Label>
+              <div className="relative">
+                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="latitude"
+                  type="text"
+                  placeholder={isFetchingLocation ? 'Fetching...' : 'Auto-detected'}
+                  value={formData.latitude !== null ? formData.latitude.toFixed(6) : ''}
+                  readOnly
+                  className={cn('h-12 pl-10', errors.latitude && 'border-destructive')}
+                  disabled={isLoading}
+                />
+              </div>
+              {errors.latitude && (
+                <p className="text-sm text-destructive">{errors.latitude}</p>
               )}
             </div>
 
+            {/* Longitude */}
             <div className="space-y-2">
-              <Label htmlFor="address">Address Details (Optional)</Label>
-              <Textarea
-                id="address"
-                placeholder="Village, Taluk, District, State..."
-                value={formData.address}
-                onChange={(e) =>
-                  setFormData({ ...formData, address: e.target.value })
-                }
-                className={cn('min-h-[100px]', errors.address && 'border-destructive')}
-                disabled={isLoading}
-              />
-              {errors.address && (
-                <p className="text-sm text-destructive">{errors.address}</p>
+              <Label htmlFor="longitude">
+                Longitude <span className="text-destructive">*</span>
+              </Label>
+              <div className="relative">
+                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="longitude"
+                  type="text"
+                  placeholder={isFetchingLocation ? 'Fetching...' : 'Auto-detected'}
+                  value={formData.longitude !== null ? formData.longitude.toFixed(6) : ''}
+                  readOnly
+                  className={cn('h-12 pl-10', errors.longitude && 'border-destructive')}
+                  disabled={isLoading}
+                />
+              </div>
+              {errors.longitude && (
+                <p className="text-sm text-destructive">{errors.longitude}</p>
               )}
             </div>
           </div>
-        )}
-      </div>
 
-      {/* Navigation Buttons */}
-      <div className="flex justify-between mt-10 pt-6 border-t border-border">
-        {currentStep > 1 ? (
+          {/* Location Error Message */}
+          {locationError && !isFetchingLocation && (
+            <div className="flex items-start gap-2 p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
+              <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <p className="text-sm text-destructive font-medium">{locationError}</p>
+                <Button
+                  type="button"
+                  variant="link"
+                  className="h-auto p-0 text-destructive underline"
+                  onClick={fetchUserLocation}
+                >
+                  Try Again
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Submit Button */}
+        <div className="mt-8 pt-6 border-t border-border">
           <Button
-            variant="outline"
+            type="submit"
             size="lg"
-            onClick={handleBack}
-            disabled={isLoading}
+            className="w-full"
+            disabled={isLoading || isFetchingLocation}
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back
-          </Button>
-        ) : (
-          <div />
-        )}
-
-        {currentStep < 3 ? (
-          <Button size="lg" onClick={handleNext} disabled={isLoading}>
-            Next
-            <ArrowRight className="w-4 h-4 ml-2" />
-          </Button>
-        ) : (
-          <Button size="lg" onClick={handleSubmit} disabled={isLoading}>
             {isLoading ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 Submitting...
+              </>
+            ) : isFetchingLocation ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Detecting Location...
               </>
             ) : (
               <>
@@ -523,8 +541,8 @@ export function BookingForm() {
               </>
             )}
           </Button>
-        )}
-      </div>
-    </div>
+        </div>
+      </form>
+    </>
   );
 }
