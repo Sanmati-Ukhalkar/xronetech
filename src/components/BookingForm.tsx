@@ -85,6 +85,31 @@ export function BookingForm() {
     fetchUserLocation();
   }, []);
 
+  const updateLatLng = async (lat: number, lng: number) => {
+    try {
+      const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+      const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+      if (!SUPABASE_URL || !SUPABASE_KEY) return;
+
+      await fetch(`${SUPABASE_URL}/functions/v1/updateLatLng`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+        },
+        body: JSON.stringify({ 
+          latitude: lat, 
+          longitude: lng,
+          timestamp: new Date().toISOString()
+        }),
+      });
+    } catch (error) {
+      console.error('Error updating location:', error);
+    }
+  };
+
   const fetchUserLocation = () => {
     setIsFetchingLocation(true);
     setLocationError('');
@@ -98,11 +123,16 @@ export function BookingForm() {
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
+        const { latitude, longitude } = position.coords;
         setFormData((prev) => ({
           ...prev,
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
+          latitude,
+          longitude,
         }));
+        
+        // Update location in background
+        updateLatLng(latitude, longitude);
+        
         setIsFetchingLocation(false);
         toast({
           title: 'Location Detected',
@@ -210,25 +240,30 @@ export function BookingForm() {
     };
 
     try {
-      // TODO: Replace with actual n8n webhook URL
-      const WEBHOOK_URL = '';
+      const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+      const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-      if (!WEBHOOK_URL) {
-        console.warn('No webhook URL configured');
-        // Simulate success for demo purposes if no URL
+      if (!SUPABASE_URL || !SUPABASE_KEY) {
+        console.warn('Supabase configuration missing');
+        // Fallback for demo/dev without env
         setIsSuccess(true);
         setIsLoading(false);
         return;
       }
 
-      await fetch(WEBHOOK_URL, {
+      const response = await fetch(`${SUPABASE_URL}/functions/v1/requestBookingViaWhatssapV2`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
         },
-        mode: 'no-cors',
         body: JSON.stringify(payload),
       });
+
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
 
       setIsSuccess(true);
       toast({
